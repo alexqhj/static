@@ -1,0 +1,10 @@
+# Claude Code
+.claude/
+.mcp.json
+
+# Playwright MCP
+.playwright-mcp/
+
+# Swarm
+.swarm/
+session-*.json

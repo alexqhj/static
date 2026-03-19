@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Playwright MCP for WSL</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --border: #30363d;
+      --text: #e6edf3;
+      --text-muted: #8b949e;
+      --accent: #da7756;
+      --accent-soft: rgba(218, 119, 86, 0.15);
+      --code-bg: #1c2129;
+      --copy-success: #3fb950;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding: 2rem 1rem;
+    }
+
+    .container {
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      font-size: 1.75rem;
+      margin-bottom: 0.5rem;
+      color: var(--text);
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      margin-bottom: 2rem;
+      font-size: 0.95rem;
+    }
+
+    h2 {
+      font-size: 1.1rem;
+      margin: 2rem 0 0.75rem;
+      color: var(--text);
+    }
+
+    p, li {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    ol {
+      padding-left: 1.25rem;
+      margin-bottom: 1rem;
+    }
+
+    li {
+      margin-bottom: 0.4rem;
+    }
+
+    code {
+      font-family: 'SF Mono', 'Cascadia Code', 'Fira Code', Consolas, monospace;
+      font-size: 0.85rem;
+      background: var(--code-bg);
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      color: var(--text);
+    }
+
+    .prompt-block {
+      position: relative;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem;
+      margin: 1rem 0;
+    }
+
+    .prompt-block pre {
+      font-family: 'SF Mono', 'Cascadia Code', 'Fira Code', Consolas, monospace;
+      font-size: 0.82rem;
+      line-height: 1.7;
+      color: var(--text);
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+
+    .copy-btn {
+      position: absolute;
+      top: 0.75rem;
+      right: 0.75rem;
+      background: var(--border);
+      color: var(--text-muted);
+      border: none;
+      border-radius: 6px;
+      padding: 0.35rem 0.75rem;
+      font-size: 0.78rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+
+    .copy-btn:hover {
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+
+    .copy-btn.copied {
+      background: rgba(63, 185, 80, 0.15);
+      color: var(--copy-success);
+    }
+
+    .note {
+      background: var(--accent-soft);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 6px 6px 0;
+      padding: 0.75rem 1rem;
+      margin: 1.5rem 0;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .note strong {
+      color: var(--accent);
+    }
+
+    .steps {
+      margin: 1.5rem 0;
+    }
+
+    .step {
+      display: flex;
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .step-num {
+      flex-shrink: 0;
+      width: 1.75rem;
+      height: 1.75rem;
+      background: var(--accent-soft);
+      color: var(--accent);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-top: 0.1rem;
+    }
+
+    .step-content h3 {
+      font-size: 0.95rem;
+      color: var(--text);
+      margin-bottom: 0.25rem;
+    }
+
+    .step-content p {
+      font-size: 0.85rem;
+    }
+
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 2rem 0;
+    }
+
+    footer {
+      margin-top: 2rem;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      text-align: center;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Playwright MCP for WSL</h1>
+    <p class="subtitle">Let Claude Code control your Windows Chrome browser from WSL using the Playwright MCP extension.</p>
+
+    <h2>Prerequisites (do these yourself)</h2>
+    <p>These steps require manual action in your Windows Chrome browser.</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h3>Install the Chrome extension</h3>
+          <p>Install <a href="https://chromewebstore.google.com/detail/playwright-mcp-bridge/mmlmfjhmonkocbjadbfplnigmagldckm" target="_blank" rel="noopener">Playwright MCP Bridge</a> from the Chrome Web Store.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <h3>Get your extension token</h3>
+          <p>Click the Playwright MCP Bridge extension icon in your Chrome toolbar, or navigate to <code>chrome-extension://mmlmfjhmonkocbjadbfplnigmagldckm/status.html</code>. Copy the <code>PLAYWRIGHT_MCP_EXTENSION_TOKEN</code> value &mdash; you'll paste this into the Claude Code prompt below.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <h3>Make sure Chrome is running</h3>
+          <p>The extension mode connects to your already-running Chrome &mdash; it doesn't launch a new instance.</p>
+        </div>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <h2>Claude Code prompt</h2>
+    <p>Copy this prompt and paste it into Claude Code. Replace <code>YOUR_TOKEN_HERE</code> with the token from step 2 above.</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h3>Copy the prompt below</h3>
+          <p>Click the copy button on the code block.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <h3>Paste into Claude Code</h3>
+          <p>Open Claude Code in your WSL terminal and paste it in.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <h3>Approve the tool calls</h3>
+          <p>Claude will configure everything and test the connection. Accept the permission prompts as it goes.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="prompt-block">
+      <button class="copy-btn" onclick="copyBlock(this, 'prompt-text')">Copy</button>
+      <pre id="prompt-text">Set up Playwright MCP to control my Windows Chrome from WSL using the browser extension. The Playwright MCP Bridge Chrome extension is already installed and Chrome is running.
+
+My extension token is: YOUR_TOKEN_HERE
+
+Do the following steps:
+
+1. Find my global MCP config file:
+   - It's at ~/.mcp.json (this is where Claude Code reads MCP server config)
+
+2. Add or update the playwright MCP server entry in the mcpServers object:
+   {
+     "playwright": {
+       "type": "stdio",
+       "command": "npx",
+       "args": [
+         "-y", "@playwright/mcp@next",
+         "--extension",
+         "--executable-path", "/mnt/c/Program Files/Google/Chrome/Application/chrome.exe"
+       ],
+       "env": {
+         "PLAYWRIGHT_MCP_EXTENSION_TOKEN": "YOUR_TOKEN_HERE"
+       }
+     }
+   }
+   - Replace YOUR_TOKEN_HERE with the token I provided above
+   - The "command" value for npx should use the full path from: which npx
+   - Add the npx directory to the PATH env var as well
+   - Merge this into the existing config — don't overwrite other MCP servers
+   - If there's already a playwright entry, replace it entirely
+
+3. Tell me to fully quit and restart Claude Code.
+   IMPORTANT: A /mcp reconnect is NOT enough — you must exit Claude Code completely and relaunch it for MCP config changes to take effect.
+   After restarting, resume this conversation with "claude --continue" so we can verify together.
+
+4. After restart, verify by asking me to test the browser_navigate tool on any URL.</pre>
+    </div>
+
+    <hr class="divider">
+
+    <h2>How it works</h2>
+
+    <div class="note">
+      <strong>Extension mode:</strong> The MCP Bridge extension lets Claude connect to your existing Windows Chrome. This means Claude can interact with pages where you're already logged in &mdash; your cookies, sessions, and browser state are all available.
+    </div>
+
+    <div class="note">
+      <strong>WSL &rarr; Windows:</strong> The <code>--executable-path</code> flag tells Playwright where to find Chrome on Windows via <code>/mnt/c/</code>. No browser needs to be installed inside WSL.
+    </div>
+
+    <div class="note">
+      <strong>Token:</strong> The <code>PLAYWRIGHT_MCP_EXTENSION_TOKEN</code> auto-approves connections so you don't have to click "Allow" in Chrome every time Claude uses the browser. Click the extension icon or visit <code>chrome-extension://mmlmfjhmonkocbjadbfplnigmagldckm/status.html</code> to find it.
+    </div>
+
+    <h2>Troubleshooting</h2>
+    <p style="margin-bottom: 0.5rem;">If Playwright can't connect:</p>
+    <ol>
+      <li>Make sure Chrome is open and the extension is enabled</li>
+      <li>Check the token hasn't changed &mdash; it regenerates if you reinstall the extension</li>
+      <li><strong style="color: var(--text);">Fully quit and restart Claude Code</strong> after any config change &mdash; <code>/mcp</code> reconnect is not enough</li>
+      <li>Verify <code>@playwright/mcp@next</code> is being used, not <code>@latest</code> &mdash; the WSL executable-path fix may not be in the stable release yet</li>
+    </ol>
+
+    <footer>
+      Uses <a href="https://github.com/microsoft/playwright-mcp" target="_blank" rel="noopener">Playwright MCP</a> &middot; <a href="https://chromewebstore.google.com/detail/playwright-mcp-bridge/mmlmfjhmonkocbjadbfplnigmagldckm" target="_blank" rel="noopener">Chrome Extension</a>
+    </footer>
+  </div>
+
+  <script>
+    function copyBlock(btn, id) {
+      const text = document.getElementById(id).textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        btn.textContent = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(() => {
+          btn.textContent = 'Copy';
+          btn.classList.remove('copied');
+        }, 2000);
+      });
+    }
+  </script>
+</body>
+</html>
