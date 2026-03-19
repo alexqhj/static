@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WSL Notification Setup for Claude Code</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --border: #30363d;
+      --text: #e6edf3;
+      --text-muted: #8b949e;
+      --accent: #da7756;
+      --accent-soft: rgba(218, 119, 86, 0.15);
+      --code-bg: #1c2129;
+      --copy-success: #3fb950;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding: 2rem 1rem;
+    }
+
+    .container {
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      font-size: 1.75rem;
+      margin-bottom: 0.5rem;
+      color: var(--text);
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      margin-bottom: 2rem;
+      font-size: 0.95rem;
+    }
+
+    h2 {
+      font-size: 1.1rem;
+      margin: 2rem 0 0.75rem;
+      color: var(--text);
+    }
+
+    p, li {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    ol {
+      padding-left: 1.25rem;
+      margin-bottom: 1rem;
+    }
+
+    li {
+      margin-bottom: 0.4rem;
+    }
+
+    .prompt-block {
+      position: relative;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem;
+      margin: 1rem 0;
+    }
+
+    .prompt-block pre {
+      font-family: 'SF Mono', 'Cascadia Code', 'Fira Code', Consolas, monospace;
+      font-size: 0.82rem;
+      line-height: 1.7;
+      color: var(--text);
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+
+    .copy-btn {
+      position: absolute;
+      top: 0.75rem;
+      right: 0.75rem;
+      background: var(--border);
+      color: var(--text-muted);
+      border: none;
+      border-radius: 6px;
+      padding: 0.35rem 0.75rem;
+      font-size: 0.78rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+
+    .copy-btn:hover {
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+
+    .copy-btn.copied {
+      background: rgba(63, 185, 80, 0.15);
+      color: var(--copy-success);
+    }
+
+    .note {
+      background: var(--accent-soft);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 6px 6px 0;
+      padding: 0.75rem 1rem;
+      margin: 1.5rem 0;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .note strong {
+      color: var(--accent);
+    }
+
+    .steps {
+      margin: 1.5rem 0;
+    }
+
+    .step {
+      display: flex;
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .step-num {
+      flex-shrink: 0;
+      width: 1.75rem;
+      height: 1.75rem;
+      background: var(--accent-soft);
+      color: var(--accent);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-top: 0.1rem;
+    }
+
+    .step-content h3 {
+      font-size: 0.95rem;
+      color: var(--text);
+      margin-bottom: 0.25rem;
+    }
+
+    .step-content p {
+      font-size: 0.85rem;
+    }
+
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 2rem 0;
+    }
+
+    footer {
+      margin-top: 2rem;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      text-align: center;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>WSL Notification Setup</h1>
+    <p class="subtitle">Get Windows toast notifications when Claude Code needs your attention.</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h3>Copy the prompt below</h3>
+          <p>Click the copy button on the code block.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <h3>Paste into Claude Code</h3>
+          <p>Open Claude Code in your WSL terminal and paste it in.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <h3>Approve the tool calls</h3>
+          <p>Claude will download, install, configure, and test the notification hook. Accept the permission prompts as it goes.</p>
+        </div>
+      </div>
+    </div>
+
+    <h2>Prompt</h2>
+    <div class="prompt-block">
+      <button class="copy-btn" onclick="copyPrompt(this)">Copy</button>
+      <pre id="prompt-text">Set up Windows toast notifications for when you need my attention. Do the following steps:
+
+1. Install wsl-notify-send:
+   - mkdir -p ~/.local/bin
+   - Download the amd64 zip from https://github.com/stuartleeks/wsl-notify-send/releases/latest using the GitHub API to find the correct asset URL (it's a zip, not a bare exe)
+   - Extract wsl-notify-send.exe to ~/.local/bin/
+   - chmod +x it
+   - Verify ~/.local/bin is in PATH, if not add it to ~/.bashrc or ~/.zshrc
+
+2. Test it works by running: wsl-notify-send.exe --category "Claude Code" "Test notification"
+
+3. Add a Notification hook to ~/.claude/settings.json:
+   {
+     "hooks": {
+       "Notification": [
+         {
+           "matcher": "",
+           "hooks": [
+             {
+               "type": "command",
+               "command": "wsl-notify-send.exe --category 'Claude Code' 'Claude needs your attention'"
+             }
+           ]
+         }
+       ]
+     }
+   }
+   Merge this into the existing settings.json - don't overwrite other settings.
+
+4. Verify the hook works by asking me a question using AskUserQuestion.</pre>
+    </div>
+
+    <hr class="divider">
+
+    <h2>After setup</h2>
+    <p>Customize the notification sound and behavior in <strong style="color: var(--text);">Windows Settings &gt; System &gt; Notifications</strong> &mdash; look for "wsl-notify-send" in the app list.</p>
+
+    <div class="note">
+      <strong>Tip:</strong> The notification fires whenever Claude is waiting for your input &mdash; permission prompts, questions, idle state, etc. You can switch to another window and you'll get pinged when Claude needs you.
+    </div>
+
+    <footer>
+      Uses <a href="https://github.com/stuartleeks/wsl-notify-send" target="_blank" rel="noopener">wsl-notify-send</a> by Stuart Leeks
+    </footer>
+  </div>
+
+  <script>
+    function copyPrompt(btn) {
+      const text = document.getElementById('prompt-text').textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        btn.textContent = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(() => {
+          btn.textContent = 'Copy';
+          btn.classList.remove('copied');
+        }, 2000);
+      });
+    }
+  </script>
+</body>
+</html>
