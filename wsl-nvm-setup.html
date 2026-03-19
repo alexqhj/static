@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Node.js + nvm Setup for WSL</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --border: #30363d;
+      --text: #e6edf3;
+      --text-muted: #8b949e;
+      --accent: #da7756;
+      --accent-soft: rgba(218, 119, 86, 0.15);
+      --code-bg: #1c2129;
+      --copy-success: #3fb950;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding: 2rem 1rem;
+    }
+
+    .container {
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      font-size: 1.75rem;
+      margin-bottom: 0.5rem;
+      color: var(--text);
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      margin-bottom: 2rem;
+      font-size: 0.95rem;
+    }
+
+    h2 {
+      font-size: 1.1rem;
+      margin: 2rem 0 0.75rem;
+      color: var(--text);
+    }
+
+    p, li {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    ol {
+      padding-left: 1.25rem;
+      margin-bottom: 1rem;
+    }
+
+    li {
+      margin-bottom: 0.4rem;
+    }
+
+    code {
+      font-family: 'SF Mono', 'Cascadia Code', 'Fira Code', Consolas, monospace;
+      font-size: 0.85rem;
+      background: var(--code-bg);
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      color: var(--text);
+    }
+
+    .prompt-block {
+      position: relative;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem;
+      margin: 1rem 0;
+    }
+
+    .prompt-block pre {
+      font-family: 'SF Mono', 'Cascadia Code', 'Fira Code', Consolas, monospace;
+      font-size: 0.82rem;
+      line-height: 1.7;
+      color: var(--text);
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+
+    .copy-btn {
+      position: absolute;
+      top: 0.75rem;
+      right: 0.75rem;
+      background: var(--border);
+      color: var(--text-muted);
+      border: none;
+      border-radius: 6px;
+      padding: 0.35rem 0.75rem;
+      font-size: 0.78rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+
+    .copy-btn:hover {
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+
+    .copy-btn.copied {
+      background: rgba(63, 185, 80, 0.15);
+      color: var(--copy-success);
+    }
+
+    .note {
+      background: var(--accent-soft);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 6px 6px 0;
+      padding: 0.75rem 1rem;
+      margin: 1.5rem 0;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .note strong {
+      color: var(--accent);
+    }
+
+    .steps {
+      margin: 1.5rem 0;
+    }
+
+    .step {
+      display: flex;
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .step-num {
+      flex-shrink: 0;
+      width: 1.75rem;
+      height: 1.75rem;
+      background: var(--accent-soft);
+      color: var(--accent);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-top: 0.1rem;
+    }
+
+    .step-content h3 {
+      font-size: 0.95rem;
+      color: var(--text);
+      margin-bottom: 0.25rem;
+    }
+
+    .step-content p {
+      font-size: 0.85rem;
+    }
+
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 2rem 0;
+    }
+
+    footer {
+      margin-top: 2rem;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      text-align: center;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Node.js + nvm Setup for WSL</h1>
+    <p class="subtitle">Install nvm with lazy loading and automatic Node version switching per project.</p>
+
+    <h2>Claude Code prompt</h2>
+    <p>Copy this prompt and paste it into Claude Code. No prerequisites needed &mdash; everything runs without sudo.</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h3>Copy the prompt below</h3>
+          <p>Click the copy button on the code block.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <h3>Paste into Claude Code</h3>
+          <p>Open Claude Code in your WSL terminal and paste it in.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <h3>Approve the tool calls</h3>
+          <p>Claude will install nvm, Node.js, and configure your shell. Accept the permission prompts as it goes.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="prompt-block">
+      <button class="copy-btn" onclick="copyBlock(this, 'prompt-text')">Copy</button>
+      <pre id="prompt-text">Set up nvm with Node.js on my WSL environment. Do the following steps:
+
+1. Install nvm:
+   - Run: curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+
+2. Install the latest LTS version of Node.js and set it as default:
+   - Source nvm first: export NVM_DIR="$HOME/.nvm" && [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+   - Run: nvm install --lts
+   - Run: nvm alias default node
+
+3. Add lazy-loaded nvm to ~/.zshrc (or ~/.bashrc if zsh is not installed).
+   Remove any existing nvm initialization lines that the nvm installer added (the "export NVM_DIR" block).
+   Replace them with this lazy-loading setup that saves ~300ms on shell startup:
+
+   export NVM_DIR="$HOME/.nvm"
+
+   # Lazy load NVM - don't source it at startup (saves ~300ms)
+   nvm() {
+     unset -f nvm node npm npx
+     [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+     [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+     nvm "$@"
+   }
+
+   # Lazy load node/npm/npx too
+   for cmd in node npm npx; do
+     eval "$cmd() { unset -f nvm node npm npx; [ -s \"\$NVM_DIR/nvm.sh\" ] && \. \"\$NVM_DIR/nvm.sh\"; $cmd \"\$@\"; }"
+   done
+
+4. Add auto-switching to ~/.zshrc (or ~/.bashrc) AFTER the lazy loading block from step 3.
+   This automatically switches Node versions when you cd into a project that has a .node-version or .nvmrc file:
+
+   # Auto-switch Node version when entering a project directory
+   autoload -U add-zsh-hook
+   load-nvmrc() {
+     local dir="$PWD"
+     local nvmrc_path=""
+
+     # Search up directory tree for .nvmrc or .node-version
+     while [[ "$dir" != "/" ]]; do
+       if [[ -f "$dir/.nvmrc" ]]; then
+         nvmrc_path="$dir/.nvmrc"
+         break
+       elif [[ -f "$dir/.node-version" ]]; then
+         nvmrc_path="$dir/.node-version"
+         break
+       fi
+       dir="${dir:h}"
+     done
+
+     if [[ -n "$nvmrc_path" ]]; then
+       local requested=$(&lt; "$nvmrc_path")
+       requested="${requested//[$'\t\r\n ']/}"
+
+       if type nvm &amp;&gt;/dev/null &amp;&amp; [[ "$(type -w nvm)" != "nvm: function" || "$(nvm current 2&gt;/dev/null)" != "" ]]; then
+         local current=$(nvm current 2&gt;/dev/null)
+         if [[ -n "$current" &amp;&amp; "$current" != "$requested" &amp;&amp; "$current" != "v$requested" ]]; then
+           echo "Switching to Node $requested..."
+           nvm use "$requested" 2&gt;/dev/null || nvm install "$requested"
+         fi
+       fi
+     elif type nvm &amp;&gt;/dev/null &amp;&amp; [[ "$(type -w nvm)" != "nvm: function" ]]; then
+       local current=$(nvm current 2&gt;/dev/null)
+       if [[ -n "$current" &amp;&amp; "$current" != "default" &amp;&amp; "$current" != "system" ]]; then
+         echo "Reverting to default Node..."
+         nvm use default 2&gt;/dev/null
+       fi
+     fi
+   }
+
+   add-zsh-hook chpwd load-nvmrc
+   load-nvmrc
+
+   NOTE: If the user has bash instead of zsh, replace "autoload -U add-zsh-hook", "add-zsh-hook chpwd load-nvmrc", and "${dir:h}" with bash equivalents (use PROMPT_COMMAND and dir="$(dirname "$dir")").
+
+5. Verify the setup:
+   - Run: zsh -c 'source ~/.zshrc && node --version && echo "nvm dir: $NVM_DIR"'
+   - Tell me to open a new terminal and cd into a project with a .node-version file to test auto-switching.</pre>
+    </div>
+
+    <hr class="divider">
+
+    <h2>What this sets up</h2>
+
+    <div class="note">
+      <strong>Lazy loading:</strong> nvm normally adds ~300ms to every shell startup. The lazy-loading wrapper defers sourcing nvm until you actually run <code>nvm</code>, <code>node</code>, <code>npm</code>, or <code>npx</code> for the first time in a session.
+    </div>
+
+    <div class="note">
+      <strong>Auto-switching:</strong> When you <code>cd</code> into a project that has a <code>.node-version</code> or <code>.nvmrc</code> file, nvm automatically switches to the correct version. It walks up the directory tree, so it works from subdirectories too. If the version isn't installed, it installs it automatically.
+    </div>
+
+    <div class="note">
+      <strong>Reverting:</strong> When you leave a project directory (cd somewhere without a <code>.node-version</code> file), it reverts to your default Node version.
+    </div>
+
+    <h2>Adding a version to your project</h2>
+    <p>To pin a Node version for your project, create a <code>.node-version</code> file in the project root:</p>
+
+    <div class="prompt-block">
+      <button class="copy-btn" onclick="copyBlock(this, 'version-text')">Copy</button>
+      <pre id="version-text">echo "22.21.1" > .node-version</pre>
+    </div>
+
+    <p style="margin-top: 0.5rem;">This ensures everyone on the team uses the same Node version. Commit this file to your repo.</p>
+
+    <footer>
+      Uses <a href="https://github.com/nvm-sh/nvm" target="_blank" rel="noopener">nvm</a> by nvm-sh
+    </footer>
+  </div>
+
+  <script>
+    function copyBlock(btn, id) {
+      const text = document.getElementById(id).textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        btn.textContent = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(() => {
+          btn.textContent = 'Copy';
+          btn.classList.remove('copied');
+        }, 2000);
+      });
+    }
+  </script>
+</body>
+</html>
