@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Oh My Zsh Setup for WSL</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --border: #30363d;
+      --text: #e6edf3;
+      --text-muted: #8b949e;
+      --accent: #da7756;
+      --accent-soft: rgba(218, 119, 86, 0.15);
+      --code-bg: #1c2129;
+      --copy-success: #3fb950;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding: 2rem 1rem;
+    }
+
+    .container {
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      font-size: 1.75rem;
+      margin-bottom: 0.5rem;
+      color: var(--text);
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      margin-bottom: 2rem;
+      font-size: 0.95rem;
+    }
+
+    h2 {
+      font-size: 1.1rem;
+      margin: 2rem 0 0.75rem;
+      color: var(--text);
+    }
+
+    p, li {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    ol {
+      padding-left: 1.25rem;
+      margin-bottom: 1rem;
+    }
+
+    li {
+      margin-bottom: 0.4rem;
+    }
+
+    code {
+      font-family: 'SF Mono', 'Cascadia Code', 'Fira Code', Consolas, monospace;
+      font-size: 0.85rem;
+      background: var(--code-bg);
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      color: var(--text);
+    }
+
+    .prompt-block {
+      position: relative;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem;
+      margin: 1rem 0;
+    }
+
+    .prompt-block pre {
+      font-family: 'SF Mono', 'Cascadia Code', 'Fira Code', Consolas, monospace;
+      font-size: 0.82rem;
+      line-height: 1.7;
+      color: var(--text);
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+
+    .copy-btn {
+      position: absolute;
+      top: 0.75rem;
+      right: 0.75rem;
+      background: var(--border);
+      color: var(--text-muted);
+      border: none;
+      border-radius: 6px;
+      padding: 0.35rem 0.75rem;
+      font-size: 0.78rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+
+    .copy-btn:hover {
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+
+    .copy-btn.copied {
+      background: rgba(63, 185, 80, 0.15);
+      color: var(--copy-success);
+    }
+
+    .note {
+      background: var(--accent-soft);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 6px 6px 0;
+      padding: 0.75rem 1rem;
+      margin: 1.5rem 0;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .note strong {
+      color: var(--accent);
+    }
+
+    .steps {
+      margin: 1.5rem 0;
+    }
+
+    .step {
+      display: flex;
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .step-num {
+      flex-shrink: 0;
+      width: 1.75rem;
+      height: 1.75rem;
+      background: var(--accent-soft);
+      color: var(--accent);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-top: 0.1rem;
+    }
+
+    .step-content h3 {
+      font-size: 0.95rem;
+      color: var(--text);
+      margin-bottom: 0.25rem;
+    }
+
+    .step-content p {
+      font-size: 0.85rem;
+    }
+
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 2rem 0;
+    }
+
+    footer {
+      margin-top: 2rem;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      text-align: center;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Oh My Zsh Setup for WSL</h1>
+    <p class="subtitle">Install zsh, Oh My Zsh, and the agnoster theme with Powerline fonts.</p>
+
+    <h2>Prerequisites (run these yourself)</h2>
+    <p>These commands require <code>sudo</code>, so you need to run them manually in your WSL terminal before handing off to Claude.</p>
+
+    <div class="prompt-block">
+      <button class="copy-btn" onclick="copyBlock(this, 'prereq-text')">Copy</button>
+      <pre id="prereq-text">sudo apt update && sudo apt install -y zsh && chsh -s $(which zsh)</pre>
+    </div>
+
+    <p>This installs zsh and sets it as your default shell. You'll need to enter your password. Once done, move on to the next step.</p>
+
+    <hr class="divider">
+
+    <h2>Claude Code prompt</h2>
+    <p>Copy this prompt and paste it into Claude Code. Everything here can run without sudo.</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h3>Copy the prompt below</h3>
+          <p>Click the copy button on the code block.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <h3>Paste into Claude Code</h3>
+          <p>Open Claude Code in your WSL terminal and paste it in.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <h3>Approve the tool calls</h3>
+          <p>Claude will install Oh My Zsh, configure the theme, and install fonts. Accept the permission prompts as it goes.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="prompt-block">
+      <button class="copy-btn" onclick="copyBlock(this, 'prompt-text')">Copy</button>
+      <pre id="prompt-text">Set up Oh My Zsh with the agnoster theme on my WSL environment. Zsh is already installed and set as my default shell. Do the following steps:
+
+1. Install Oh My Zsh (no sudo needed):
+   - Run the unattended installer: sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+
+2. Set the agnoster theme:
+   - Edit ~/.zshrc and change ZSH_THEME="robbyrussell" to ZSH_THEME="agnoster"
+
+3. Install Powerline fonts for Windows (required for agnoster's arrow characters):
+   - Clone the powerline/fonts repo: git clone --depth=1 https://github.com/powerline/fonts.git /tmp/powerline-fonts
+   - Find my Windows username by listing /mnt/c/Users/ (skip Public, Default, and "Default User")
+   - Copy all .ttf files from the cloned repo into the user font directory:
+     /mnt/c/Users/USERNAME/AppData/Local/Microsoft/Windows/Fonts/
+   - Clean up: rm -rf /tmp/powerline-fonts
+
+4. Configure Windows Terminal (font, color scheme, and appearance):
+   - Find my Windows username by listing /mnt/c/Users/ (skip Public, Default, and "Default User")
+   - Using that username, find the Windows Terminal settings.json:
+     /mnt/c/Users/{username}/AppData/Local/Packages/Microsoft.WindowsTerminal*/LocalState/settings.json
+     Use a glob — the package folder varies (e.g. Microsoft.WindowsTerminal_*, Microsoft.WindowsTerminalPreview_*)
+   - Add the "Material" color scheme to the "schemes" array if it doesn't already exist:
+     {
+       "background": "#263238",
+       "black": "#000000",
+       "blue": "#82AAFF",
+       "brightBlack": "#546E7A",
+       "brightBlue": "#82AAFF",
+       "brightCyan": "#89DDFF",
+       "brightGreen": "#C3E88D",
+       "brightPurple": "#C792EA",
+       "brightRed": "#F07178",
+       "brightWhite": "#FFFFFF",
+       "brightYellow": "#FFCB6B",
+       "cursorColor": "#FFFFFF",
+       "cyan": "#89DDFF",
+       "foreground": "#EEFFFF",
+       "green": "#C3E88D",
+       "name": "Material",
+       "purple": "#C792EA",
+       "red": "#F07178",
+       "selectionBackground": "#FFFFFF",
+       "white": "#FFFFFF",
+       "yellow": "#FFCB6B"
+     }
+   - Find the WSL/Ubuntu profile in the "profiles" > "list" array (look for a commandline containing "wsl.exe") and set/add these properties:
+     "colorScheme": "Material"
+     "cursorShape": "filledBox"
+     "font": { "face": "DejaVu Sans Mono for Powerline", "size": 12 }
+     "opacity": 80
+     "startingDirectory": "~"
+   - Do NOT change the profile's guid, name, commandline, icon, or any other existing properties
+   - Make sure the resulting file is valid JSON
+
+5. Tell me to also set my VS Code terminal font:
+   - Set terminal.integrated.fontFamily to 'DejaVu Sans Mono for Powerline'
+
+6. Verify the setup by running: zsh -c 'source ~/.zshrc && echo "Theme: $ZSH_THEME" && echo "Oh My Zsh: $ZSH"'</pre>
+    </div>
+
+    <hr class="divider">
+
+    <h2>After setup</h2>
+    <p>Claude will configure Windows Terminal automatically. If you need to verify or adjust settings manually, here's what it sets:</p>
+
+    <div class="note">
+      <strong>Font:</strong> <strong style="color: var(--text);">DejaVu Sans Mono for Powerline</strong> at size <strong style="color: var(--text);">12</strong>. This is a Powerline-patched font required for agnoster's arrow characters.
+    </div>
+
+    <div class="note">
+      <strong>Color scheme:</strong> <strong style="color: var(--text);">Material</strong> &mdash; a dark theme with a <span style="color: #263238; background: #546E7A; padding: 0.1rem 0.3rem; border-radius: 3px;">#263238</span> background. Colors include <span style="color: #F07178;">red</span>, <span style="color: #C3E88D;">green</span>, <span style="color: #FFCB6B;">yellow</span>, <span style="color: #82AAFF;">blue</span>, <span style="color: #C792EA;">purple</span>, and <span style="color: #89DDFF;">cyan</span>.
+    </div>
+
+    <img src="assets/wsl-font-settings.png" alt="Windows Terminal Appearance settings showing DejaVu Sans Mono for Powerline at size 12 with Material color scheme" style="width: 100%; border-radius: 8px; border: 1px solid var(--border); margin: 0.5rem 0 1rem;">
+
+    <div class="note">
+      <strong>VS Code:</strong> Claude will remind you to set this manually. Open Settings (JSON) and add:
+      <pre style="margin-top: 0.5rem; font-family: 'SF Mono', 'Cascadia Code', 'Fira Code', Consolas, monospace; font-size: 0.82rem; line-height: 1.5; color: var(--text);">{
+  "terminal.integrated.fontFamily": "DejaVu Sans Mono for Powerline",
+  "terminal.integrated.fontSize": 12
+}</pre>
+    </div>
+
+    <p style="margin-top: 1rem;">Once done, open a new terminal tab and you should see the full agnoster prompt with arrows, git branch info, and status indicators.</p>
+
+    <footer>
+      Uses <a href="https://github.com/ohmyzsh/ohmyzsh" target="_blank" rel="noopener">Oh My Zsh</a> &middot; Fonts from <a href="https://github.com/powerline/fonts" target="_blank" rel="noopener">powerline/fonts</a>
+    </footer>
+  </div>
+
+  <script>
+    function copyBlock(btn, id) {
+      const text = document.getElementById(id).textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        btn.textContent = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(() => {
+          btn.textContent = 'Copy';
+          btn.classList.remove('copied');
+        }, 2000);
+      });
+    }
+  </script>
+</body>
+</html>
