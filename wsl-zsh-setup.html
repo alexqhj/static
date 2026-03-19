@@ -193,15 +193,42 @@
     <h1>Oh My Zsh Setup for WSL</h1>
     <p class="subtitle">Install zsh, Oh My Zsh, and the agnoster theme with Powerline fonts.</p>
 
-    <h2>Prerequisites (run these yourself)</h2>
-    <p>These commands require <code>sudo</code>, so you need to run them manually in your WSL terminal before handing off to Claude.</p>
+    <h2>Prerequisites (do these yourself)</h2>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h3>Install zsh</h3>
+          <p>Run this in your WSL terminal (needs your password):</p>
+        </div>
+      </div>
+    </div>
 
     <div class="prompt-block">
       <button class="copy-btn" onclick="copyBlock(this, 'prereq-text')">Copy</button>
       <pre id="prereq-text">sudo apt update && sudo apt install -y zsh && chsh -s $(which zsh)</pre>
     </div>
 
-    <p>This installs zsh and sets it as your default shell. You'll need to enter your password. Once done, move on to the next step.</p>
+    <div class="steps" style="margin-top: 1.5rem;">
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <h3>Install a Powerline font on Windows</h3>
+          <p>The agnoster theme needs a Powerline-patched font for its arrow characters. Install this <strong style="color: var(--text);">on Windows</strong> (not inside WSL):</p>
+        </div>
+      </div>
+    </div>
+
+    <ol>
+      <li>Download <a href="https://github.com/powerline/fonts/raw/master/DejaVuSansMono/DejaVu%20Sans%20Mono%20for%20Powerline.ttf" target="_blank" rel="noopener">DejaVu Sans Mono for Powerline</a></li>
+      <li>Double-click the downloaded <code>.ttf</code> file</li>
+      <li>Click <strong style="color: var(--text);">Install</strong></li>
+    </ol>
+
+    <div class="note">
+      <strong>Why manually?</strong> Installing fonts on Windows from WSL is unreliable. Doing it yourself takes 10 seconds and avoids issues.
+    </div>
 
     <hr class="divider">
 
@@ -239,17 +266,25 @@
 1. Install Oh My Zsh (no sudo needed):
    - Run the unattended installer: sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
 
-2. Set the agnoster theme:
+2. Migrate config from bash (IMPORTANT — do this before anything else):
+   - Read ~/.bashrc and identify any custom additions: PATH exports, nvm setup, aliases, environment variables, or anything that isn't a default Ubuntu comment/block
+   - If there are custom lines, add them to the END of ~/.zshrc (after the "source $ZSH/oh-my-zsh.sh" line)
+   - At minimum, make sure ~/.zshrc contains: export PATH="$HOME/.local/bin:$PATH"
+   - Do NOT duplicate anything already in ~/.zshrc
+   - Do NOT modify the Oh My Zsh config at the top of ~/.zshrc
+   - If ~/.bashrc has nvm setup, skip it — the nvm guide handles that separately
+
+3. Set the agnoster theme:
    - Edit ~/.zshrc and change ZSH_THEME="robbyrussell" to ZSH_THEME="agnoster"
 
-3. Install Powerline fonts for Windows (required for agnoster's arrow characters):
-   - Clone the powerline/fonts repo: git clone --depth=1 https://github.com/powerline/fonts.git /tmp/powerline-fonts
+4. Check that the Powerline font is installed on Windows:
    - Find my Windows username by listing /mnt/c/Users/ (skip Public, Default, and "Default User")
-   - Copy all .ttf files from the cloned repo into the user font directory:
-     /mnt/c/Users/USERNAME/AppData/Local/Microsoft/Windows/Fonts/
-   - Clean up: rm -rf /tmp/powerline-fonts
+   - Check if "DejaVu Sans Mono for Powerline" exists in either:
+     /mnt/c/Windows/Fonts/ or /mnt/c/Users/USERNAME/AppData/Local/Microsoft/Windows/Fonts/
+   - Search for files matching *DejaVu*Powerline*
+   - If not found, tell me to install it manually: download the .ttf from https://github.com/powerline/fonts and double-click to install on Windows
 
-4. Configure Windows Terminal (font, color scheme, and appearance):
+5. Configure Windows Terminal (font, color scheme, and appearance):
    - Find my Windows username by listing /mnt/c/Users/ (skip Public, Default, and "Default User")
    - Using that username, find the Windows Terminal settings.json:
      /mnt/c/Users/{username}/AppData/Local/Packages/Microsoft.WindowsTerminal*/LocalState/settings.json
@@ -287,10 +322,10 @@
    - Do NOT change the profile's guid, name, commandline, icon, or any other existing properties
    - Make sure the resulting file is valid JSON
 
-5. Tell me to also set my VS Code terminal font:
+6. Tell me to also set my VS Code terminal font:
    - Set terminal.integrated.fontFamily to 'DejaVu Sans Mono for Powerline'
 
-6. Verify the setup by running: zsh -c 'source ~/.zshrc && echo "Theme: $ZSH_THEME" && echo "Oh My Zsh: $ZSH"'</pre>
+7. Verify the setup by running: zsh -c 'source ~/.zshrc && echo "Theme: $ZSH_THEME" && echo "Oh My Zsh: $ZSH"'</pre>
     </div>
 
     <hr class="divider">
@@ -299,7 +334,7 @@
     <p>Claude will configure Windows Terminal automatically. If you need to verify or adjust settings manually, here's what it sets:</p>
 
     <div class="note">
-      <strong>Font:</strong> <strong style="color: var(--text);">DejaVu Sans Mono for Powerline</strong> at size <strong style="color: var(--text);">12</strong>. This is a Powerline-patched font required for agnoster's arrow characters.
+      <strong>Font:</strong> <strong style="color: var(--text);">DejaVu Sans Mono for Powerline</strong> at size <strong style="color: var(--text);">12</strong>. You installed this in the prerequisites step above.
     </div>
 
     <div class="note">
@@ -317,6 +352,24 @@
     </div>
 
     <p style="margin-top: 1rem;">Once done, open a new terminal tab and you should see the full agnoster prompt with arrows, git branch info, and status indicators.</p>
+
+    <hr class="divider">
+
+    <h2>Troubleshooting</h2>
+
+    <p style="margin-bottom: 0.75rem; font-weight: 600; color: var(--text);">Commands like <code>claude</code>, <code>node</code>, or <code>npm</code> stopped working after setup</p>
+    <p style="margin-bottom: 0.5rem;">Switching from bash to zsh means your <code>~/.bashrc</code> is no longer loaded. Any PATH additions, aliases, or environment variables you had in bash need to be in <code>~/.zshrc</code> instead. The Claude prompt above handles this migration automatically, but if something was missed:</p>
+    <ol>
+      <li>Check what's in your old bash config: <code>cat ~/.bashrc</code></li>
+      <li>Copy any custom lines (PATH exports, aliases, nvm setup) to the end of <code>~/.zshrc</code></li>
+      <li>Open a new terminal tab to pick up the changes</li>
+    </ol>
+
+    <p style="margin-top: 0.75rem;">Quick fix if <code>claude</code> is the only thing missing:</p>
+    <div class="prompt-block">
+      <button class="copy-btn" onclick="copyBlock(this, 'fix-text')">Copy</button>
+      <pre id="fix-text">echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.zshrc</pre>
+    </div>
 
     <footer>
       Uses <a href="https://github.com/ohmyzsh/ohmyzsh" target="_blank" rel="noopener">Oh My Zsh</a> &middot; Fonts from <a href="https://github.com/powerline/fonts" target="_blank" rel="noopener">powerline/fonts</a>
