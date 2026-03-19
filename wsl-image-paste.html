@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Image Paste for Claude Code on WSL</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --border: #30363d;
+      --text: #e6edf3;
+      --text-muted: #8b949e;
+      --accent: #da7756;
+      --accent-soft: rgba(218, 119, 86, 0.15);
+      --code-bg: #1c2129;
+      --copy-success: #3fb950;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding: 2rem 1rem;
+    }
+
+    .container {
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      font-size: 1.75rem;
+      margin-bottom: 0.5rem;
+      color: var(--text);
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      margin-bottom: 2rem;
+      font-size: 0.95rem;
+    }
+
+    h2 {
+      font-size: 1.1rem;
+      margin: 2rem 0 0.75rem;
+      color: var(--text);
+    }
+
+    p, li {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    ol {
+      padding-left: 1.25rem;
+      margin-bottom: 1rem;
+    }
+
+    li {
+      margin-bottom: 0.4rem;
+    }
+
+    code {
+      font-family: 'SF Mono', 'Cascadia Code', 'Fira Code', Consolas, monospace;
+      font-size: 0.85rem;
+      background: var(--code-bg);
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      color: var(--text);
+    }
+
+    .prompt-block {
+      position: relative;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem;
+      margin: 1rem 0;
+    }
+
+    .prompt-block pre {
+      font-family: 'SF Mono', 'Cascadia Code', 'Fira Code', Consolas, monospace;
+      font-size: 0.82rem;
+      line-height: 1.7;
+      color: var(--text);
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+
+    .copy-btn {
+      position: absolute;
+      top: 0.75rem;
+      right: 0.75rem;
+      background: var(--border);
+      color: var(--text-muted);
+      border: none;
+      border-radius: 6px;
+      padding: 0.35rem 0.75rem;
+      font-size: 0.78rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+
+    .copy-btn:hover {
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+
+    .copy-btn.copied {
+      background: rgba(63, 185, 80, 0.15);
+      color: var(--copy-success);
+    }
+
+    .note {
+      background: var(--accent-soft);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 6px 6px 0;
+      padding: 0.75rem 1rem;
+      margin: 1.5rem 0;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .note strong {
+      color: var(--accent);
+    }
+
+    .steps {
+      margin: 1.5rem 0;
+    }
+
+    .step {
+      display: flex;
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .step-num {
+      flex-shrink: 0;
+      width: 1.75rem;
+      height: 1.75rem;
+      background: var(--accent-soft);
+      color: var(--accent);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-top: 0.1rem;
+    }
+
+    .step-content h3 {
+      font-size: 0.95rem;
+      color: var(--text);
+      margin-bottom: 0.25rem;
+    }
+
+    .step-content p {
+      font-size: 0.85rem;
+    }
+
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 2rem 0;
+    }
+
+    footer {
+      margin-top: 2rem;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      text-align: center;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    kbd {
+      display: inline-block;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.1rem 0.4rem;
+      font-family: 'SF Mono', 'Cascadia Code', 'Fira Code', Consolas, monospace;
+      font-size: 0.82rem;
+      color: var(--text);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Image Paste for Claude Code on WSL</h1>
+    <p class="subtitle">Paste screenshots directly into Claude Code from your Windows clipboard.</p>
+
+    <h2>The problem</h2>
+    <p>Windows captures screenshots as BMP, but Claude Code expects PNG. On WSL, pasting an image with <kbd>Ctrl</kbd>+<kbd>V</kbd> doesn't work because Windows Terminal intercepts the keystroke. This guide installs a lightweight wrapper that bridges both gaps.</p>
+
+    <div class="note">
+      <strong>Drag and drop already works:</strong> You can drag an image file from Windows Explorer directly into the Claude Code terminal window. This guide is specifically for <strong style="color: var(--text);">clipboard paste</strong> (screenshots, snipping tool, copied images).
+    </div>
+
+    <div class="note">
+      <strong>File paths work too:</strong> You can reference any image by path in your message and Claude will read it. Use <code>/mnt/c/</code> to reach Windows files, e.g. <code>/mnt/c/Users/you/Pictures/screenshot.png</code>.
+    </div>
+
+    <hr class="divider">
+
+    <h2>Prerequisites (run this yourself)</h2>
+    <p>The install script needs <code>sudo</code> to install dependencies and write to <code>/usr/local/bin/</code>.</p>
+
+    <div class="prompt-block">
+      <button class="copy-btn" onclick="copyBlock(this, 'prereq-text')">Copy</button>
+      <pre id="prereq-text">wget -qO /tmp/install-wl-paste-wrapper.sh https://alexqhj.github.io/static/assets/install-wl-paste-wrapper.sh && bash /tmp/install-wl-paste-wrapper.sh</pre>
+    </div>
+
+    <p>This installs <code>imagemagick</code> and <code>wl-clipboard</code>, then places a thin wrapper at <code>/usr/local/bin/wl-paste</code> that converts BMP clipboard images to PNG on the fly.</p>
+
+    <hr class="divider">
+
+    <h2>Claude Code prompt</h2>
+    <p>Copy this prompt and paste it into Claude Code to set up the keybinding.</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h3>Copy the prompt below</h3>
+          <p>Click the copy button on the code block.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <h3>Paste into Claude Code</h3>
+          <p>Open Claude Code in your WSL terminal and paste it in.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <h3>Approve the tool calls</h3>
+          <p>Claude will create the keybinding config file. Accept the permission prompt.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="prompt-block">
+      <button class="copy-btn" onclick="copyBlock(this, 'prompt-text')">Copy</button>
+      <pre id="prompt-text">Set up a keybinding for pasting images into Claude Code on WSL.
+
+Windows Terminal intercepts Ctrl+V, so we need a different key for image paste. The default is Alt+V, but you can change it below.
+
+1. Create (or update) ~/.claude/keybindings.json with this content:
+   {
+     "bindings": [
+       {
+         "context": "Chat",
+         "bindings": {
+           "alt+v": "chat:imagePaste"
+         }
+       }
+     ]
+   }
+
+   If the file already exists, merge the new binding into the existing bindings — don't overwrite other keybindings.
+
+2. IMPORTANT: Tell me to fully quit and restart Claude Code for the keybinding to take effect.
+   After restarting, resume with "claude --continue" so we can verify together.
+
+3. After restart, tell me to take a screenshot with Win+Shift+S and press Alt+V to test the image paste.</pre>
+    </div>
+
+    <hr class="divider">
+
+    <h2>Usage</h2>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h3>Take a screenshot</h3>
+          <p>Press <kbd>Win</kbd>+<kbd>Shift</kbd>+<kbd>S</kbd> to open the Snipping Tool, or copy any image to clipboard.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <h3>Paste into Claude Code</h3>
+          <p>Press <kbd>Alt</kbd>+<kbd>V</kbd> (or your custom keybinding) in the Claude Code prompt. The image will appear inline.</p>
+        </div>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <h2>Custom keybinding</h2>
+    <p>If you'd prefer a different key combination, edit <code>~/.claude/keybindings.json</code> and change <code>"alt+v"</code> to your preferred binding. Examples:</p>
+
+    <div class="prompt-block">
+      <pre style="line-height: 2;">"alt+v": "chat:imagePaste"           <span style="color: var(--text-muted);">// default</span>
+"ctrl+shift+v": "chat:imagePaste"    <span style="color: var(--text-muted);">// Ctrl+Shift+V</span>
+"alt+i": "chat:imagePaste"           <span style="color: var(--text-muted);">// Alt+I for "image"</span>
+"alt+p": "chat:imagePaste"           <span style="color: var(--text-muted);">// Alt+P for "paste"</span></pre>
+    </div>
+
+    <p style="margin-top: 0.5rem;">Restart Claude Code after changing keybindings.</p>
+
+    <hr class="divider">
+
+    <h2>How it works</h2>
+
+    <div class="note">
+      <strong>The wrapper:</strong> A thin script at <code>/usr/local/bin/wl-paste</code> that intercepts calls from Claude Code. When the clipboard contains a BMP image (Windows default), it converts it to PNG via ImageMagick. All other clipboard operations pass through to the real <code>/usr/bin/wl-paste</code> unchanged.
+    </div>
+
+    <div class="note">
+      <strong>The keybinding:</strong> Windows Terminal captures <kbd>Ctrl</kbd>+<kbd>V</kbd> before it reaches Claude Code, so we bind <code>chat:imagePaste</code> to <kbd>Alt</kbd>+<kbd>V</kbd> instead. This tells Claude Code to read the clipboard image.
+    </div>
+
+    <h2>Uninstall</h2>
+    <p>To remove the image paste setup:</p>
+
+    <div class="prompt-block">
+      <button class="copy-btn" onclick="copyBlock(this, 'uninstall-text')">Copy</button>
+      <pre id="uninstall-text">sudo rm /usr/local/bin/wl-paste</pre>
+    </div>
+
+    <p style="margin-top: 0.5rem;">To also remove the keybinding, edit <code>~/.claude/keybindings.json</code> and delete the <code>"alt+v": "chat:imagePaste"</code> entry.</p>
+
+    <footer>
+      Based on <a href="https://github.com/anthropics/claude-code/issues/13738#issuecomment-3947404694" target="_blank" rel="noopener">this workaround</a> from the Claude Code community
+    </footer>
+  </div>
+
+  <script>
+    function copyBlock(btn, id) {
+      const text = document.getElementById(id).textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        btn.textContent = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(() => {
+          btn.textContent = 'Copy';
+          btn.classList.remove('copied');
+        }, 2000);
+      });
+    }
+  </script>
+</body>
+</html>
